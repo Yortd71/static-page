@@ -54,7 +54,8 @@
       const statusEl = document.getElementById('status');
 
       // Connect event
-      connectBtn.addEventListener('click', async () => {
+      connectBtn.addEventListener('click', alert("Connect button clicked!");
+ () => {
         try {
           // If already connected, do nothing
           if (!solflareAdapter.connected) {
@@ -69,7 +70,8 @@
       });
 
       // Sign Message event
-      signBtn.addEventListener('click', async () => {
+      signBtn.addEventListener('click', alert("Connect button clicked!");
+ () => {
         if (!solflareAdapter.connected || !walletPublicKey) {
           statusEl.textContent = 'Wallet not connected!';
           return;
