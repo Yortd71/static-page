@@ -1,100 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Solflare Sign Message Demo</title>
-  <!-- Include a CDN for the Solana Wallet Adapter and web3 packages (experimental) -->
-  <script src="https://unpkg.com/@solana/wallet-adapter-base@0.11.2/dist/index.umd.js"></script>
-  <script src="https://unpkg.com/@solana/wallet-adapter-wallets@0.13.5/dist/index.umd.js"></script>
-  <script src="https://unpkg.com/@solana/wallet-adapter-react@0.19.4/dist/index.umd.js"></script>
-  <script src="https://unpkg.com/@solana/web3.js@1.84.0/lib/index.iife.min.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 20px;
-    }
-    button {
-      padding: 10px 16px;
-      margin-right: 10px;
-      cursor: pointer;
-    }
-    #status {
-      margin-top: 10px;
-      font-family: monospace;
-      white-space: pre-wrap;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solflare Wallet Integration</title>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/wallet-adapter-solflare@0.6.28/lib/cjs/index.min.js"></script>
 </head>
 <body>
-  <h1>Solflare Sign Message Demo</h1>
-  <button id="connectBtn">Connect to Solflare</button>
-  <button id="signBtn" disabled>Sign Message</button>
-  <div id="status"></div>
+    <button id="connect-button">Connect to Solflare</button>
+    <button id="sign-button">Sign Message</button>
 
-  <script>
-    // We'll use the Solana Web3 library plus the wallet adapters
-    const { PublicKey } = solanaWeb3;
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { SolflareWalletAdapter } = solanaWalletAdapterSolflare;
+            const wallet = new SolflareWalletAdapter();
 
-    let solflareAdapter;
-    let walletPublicKey = null;
+            document.getElementById('connect-button').addEventListener('click', async () => {
+                try {
+                    await wallet.connect();
+                    alert('Connected to Solflare wallet');
+                } catch (error) {
+                    console.error('Failed to connect to Solflare wallet:', error);
+                }
+            });
 
-    // On page load, set up the Solflare adapter
-    window.addEventListener('DOMContentLoaded', async () => {
-      // The Solflare wallet adapter from the wallet-adapter-wallets UMD build
-      const { SolflareWalletAdapter } = window.walletAdapterWallets;
+            document.getElementById('sign-button').addEventListener('click', async () => {
+                if (!wallet.connected) {
+                    alert('Please connect to the wallet first');
+                    return;
+                }
 
-      // Create a new adapter instance
-      solflareAdapter = new SolflareWalletAdapter({
-        // If you have a custom network or config, set them here
-      });
-
-      // Access our buttons
-      const connectBtn = document.getElementById('connectBtn');
-      const signBtn = document.getElementById('signBtn');
-      const statusEl = document.getElementById('status');
-
-      // Connect event
-      connectBtn.addEventListener('click', alert("Connect button clicked!");
- () => {
-        try {
-          // If already connected, do nothing
-          if (!solflareAdapter.connected) {
-            await solflareAdapter.connect();
-          }
-          walletPublicKey = solflareAdapter.publicKey.toBase58();
-          statusEl.textContent = `Connected!\\nPublic Key: ${walletPublicKey}`;
-          signBtn.disabled = false;
-        } catch (err) {
-          statusEl.textContent = `Connection error: ${err.message}`;
-        }
-      });
-
-      // Sign Message event
-      signBtn.addEventListener('click', alert("Connect button clicked!");
- () => {
-        if (!solflareAdapter.connected || !walletPublicKey) {
-          statusEl.textContent = 'Wallet not connected!';
-          return;
-        }
-        try {
-          // For demonstration: a simple text message
-          const message = new TextEncoder().encode('Hello from MyBot!');
-          // The Solflare adapter's signMessage method:
-          const signature = await solflareAdapter.signMessage(message);
-          
-          // Convert signature to base64 or hex for display
-          const signatureBase64 = btoa(String.fromCharCode(...signature));
-          statusEl.textContent = `Message signed!\\nSignature (base64): ${signatureBase64}`;
-          
-          // You could also send the signature to your backend here
-          // fetch('/api/verifySignature', { method: 'POST', body: JSON.stringify({ publicKey: walletPublicKey, signatureBase64 })});
-          
-        } catch (err) {
-          statusEl.textContent = `Sign error: ${err.message}`;
-        }
-      });
-    });
-  </script>
+                try {
+                    const message = new TextEncoder().encode('Hello, Solflare!');
+                    const signature = await wallet.signMessage(message);
+                    alert('Message signed: ' + signature);
+                } catch (error) {
+                    console.error('Failed to sign message:', error);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-
